@@ -51,22 +51,38 @@ class Signer {
     return $this->privateKeyResource;
   }
 
-  /**
-   * @param array $params
-   * @return string
-   */
-  public function sign (array $params): string {
-    $digestText = implode('|', $params);
-    openssl_sign($digestText, $digest, $this->getPrivateKeyResource());
-    $digest = base64_encode($digest);
+    /**
+     * Reorder params to proper order and sign to make DIGEST value
+     * 
+     * @param array $params
+     * 
+     * @return string
+     */
+    public function sign(array $params): string {
+        $paramsOrdered = [];
+        foreach (Api::PAYMENT_PARAMS as $panme => $pprps) {
+            if (array_key_exists($panme, $params)) {
+                $paramsOrdered[$panme] = $params[$panme];
+            }
+            if (Api::PAYMENT_PARAMS[$panme]['required'] === true) {
+                if(!array_key_exists($panme, $params)){
+                    throw new SignerException('Required field '.$panme.' is not present in params to sign');
+                }
+            }
+        }
+        $digestText = implode('|', $paramsOrdered);
+        openssl_sign($digestText, $digest, $this->getPrivateKeyResource());
+        $digest = base64_encode($digest);
 
-    return $digest;
-  }
+        return $digest;
+    }
 
   /**
    * @param array $params
    * @param string $digest
+   * 
    * @return bool
+   * 
    * @throws SignerException
    */
   public function verify (array $params, $digest) {

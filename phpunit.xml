@@ -1,7 +1,12 @@
 <phpunit bootstrap="vendor/autoload.php">
-  <testsuites>
-    <testsuite>
-      <directory>tests</directory>
-    </testsuite>
-  </testsuites>
+    <testsuites>
+        <testsuite name="all">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">src/AdamStipak</directory>
+        </whitelist>
+    </filter>
 </phpunit>

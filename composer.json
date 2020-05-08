@@ -1,14 +1,21 @@
 {
-  "name": "adamstipak/webpay-php",
+  "name": "purehtml/gpwebpay",
   "description": "GP Webpay API Wrapper",
   "type": "library",
   "keywords": ["webpay", "php"],
   "license": "MIT",
-  "homepage": "https://github.com/newPOPE/webpay-php",
+  "homepage": "https://github.com/PureHTML/gp-webpay-php-sdk",
+  "replace": {
+        "adamstipak/webpay-php": "*"
+  },
   "authors": [
     {
       "name": "Adam Štipák",
       "homepage": "http://newpope.org"
+    },
+    {
+      "name": "Vítězslav Dvořák",
+      "homepage": "http://vitexsoftware.cz/"
     }
   ],
   "autoload": {
@@ -19,6 +26,6 @@
     "ext-openssl": "*"
   },
   "require-dev": {
-    "phpunit/phpunit": "6.4.*"
+    "phpunit/phpunit": "^9"
   }
 }
