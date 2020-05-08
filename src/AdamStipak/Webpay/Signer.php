@@ -60,6 +60,7 @@ class Signer {
      */
     public function sign(array $params): string {
         $paramsOrdered = [];
+        
         foreach (Api::PAYMENT_PARAMS as $panme => $pprps) {
             if (array_key_exists($panme, $params)) {
                 $paramsOrdered[$panme] = $params[$panme];

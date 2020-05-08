@@ -44,6 +44,8 @@ class Api {
     ];
 
     /**
+     * API Client Class
+     * 
      * @param $merchantNumber
      * @param $webPayUrl
      * @param Signer $signer
@@ -55,7 +57,10 @@ class Api {
     }
 
     /**
+     * Generate Request URL from object content
+     * 
      * @param PaymentRequest $request
+     * 
      * @return string
      */
     public function createPaymentRequestUrl(PaymentRequest $request): string {
@@ -67,6 +72,7 @@ class Api {
 
     /**
      * @param \AdamStipak\Webpay\PaymentRequest $request
+     * 
      * @return array
      */
     public function createPaymentParam(PaymentRequest $request): array {
@@ -79,6 +85,8 @@ class Api {
     }
 
     /**
+     * Payment Response verification
+     * 
      * @param PaymentResponse $response
      * @throws Exception
      * @throws PaymentResponseException

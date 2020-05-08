@@ -6,93 +6,102 @@ use PHPUnit\Framework\TestCase;
 
 class ApiTest extends TestCase {
 
-  public function testVerifyPaymentResponse () {
-    $response = $this->getMockBuilder('AdamStipak\Webpay\PaymentResponse')
-      ->setConstructorArgs(
-        [
-          'operation',
-          'ordernumber',
-          'merordernum',
-          0,
-          0,
-          'resulttext',
-          'digest',
-          'digest1',
-        ]
-      )
-      ->setMethods(
-        [
-          'hasError',
-        ]
-      )
-      ->getMock();
+    public function testVerifyPaymentResponse() {
+        $response = $this->getMockBuilder('AdamStipak\Webpay\PaymentResponse')
+                ->setConstructorArgs(
+                        [
+                            'operation',
+                            'ordernumber',
+                            'merordernum',
+                            0,
+                            0,
+                            'resulttext',
+                            'digest',
+                            'digest1',
+                        ]
+                )
+                ->setMethods(
+                        [
+                            'hasError',
+                        ]
+                )
+                ->getMock();
 
-    $response->expects($this->once())
-      ->method('hasError')
-      ->willReturn(false);
+        $response->expects($this->once())
+                ->method('hasError')
+                ->willReturn(false);
 
-    $signer = $this->getMockBuilder('AdamStipak\\Webpay\\Signer')
-      ->disableOriginalConstructor()
-      ->setMethods(
-        [
-          'verify',
-        ]
-      )
-      ->getMock();
+        $signer = $this->getMockBuilder('AdamStipak\\Webpay\\Signer')
+                ->disableOriginalConstructor()
+                ->setMethods(
+                        [
+                            'verify',
+                        ]
+                )
+                ->getMock();
 
-    $signer->expects($this->exactly(2))
-      ->method('verify');
+        $signer->expects($this->exactly(2))
+                ->method('verify');
 
-    $api = new Api(123456789, 'http://foo.bar', $signer);
+        $api = new Api(123456789, 'http://foo.bar', $signer);
 
-    $api->verifyPaymentResponse($response);
-  }
+        $api->verifyPaymentResponse($response);
+    }
 
-  /**
-   * @expectedException \AdamStipak\Webpay\PaymentResponseException
-   */
-  public function testPaymentHasErrorInVerifyPaymentResponse () {
-    $merchantNumber = 123456789;
-    $params = [
-      'OPERATION'      => 'operation',
-      'ORDERNUMBER'    => 'ordernumber',
-      'MERORDERNUMBER' => 'merordernum',
-      'PRCODE'         => 1,
-      'SRCODE'         => 2,
-      'RESULTTEXT'     => 'resulttext',
-    ];
+    /**
+     * @expectedException \AdamStipak\Webpay\PaymentResponseException
+     */
+    public function testPaymentHasErrorInVerifyPaymentResponse() {
+        $merchantNumber = 123456789;
+        $params = [
+            'OPERATION' => 'operation',
+            'ORDERNUMBER' => 'ordernumber',
+            'MERORDERNUMBER' => 'merordernum',
+            'PRCODE' => 1,
+            'SRCODE' => 2,
+            'RESULTTEXT' => 'resulttext',
+            'MERCHANTNUMBER' => 1234,
+            'AMOUNT' => 100.200,
+            'DEPOSITFLAG' => 1,
+            'URL' => 'http://localhost'
+        ];
 
-    $signer = new Signer(
-      __DIR__ . '/keys/test_key.pem',
-      'changeit',
-      __DIR__ . '/keys/test_cert.pem'
-    );
+        $signer = new Signer(
+                __DIR__ . '/keys/test_key.pem',
+                'changeit',
+                __DIR__ . '/keys/test_cert.pem'
+        );
 
-    $digest = $signer->sign($params);
-    $params['MERCHANTNUMBER'] = $merchantNumber;
-    $digest1 = $signer->sign($params);
+        $digest = $signer->sign($params);
+        $params['MERCHANTNUMBER'] = $merchantNumber;
+        $digest1 = $signer->sign($params);
 
-    $response = new PaymentResponse(
-      $params['OPERATION'],
-      $params['ORDERNUMBER'],
-      $params['MERORDERNUMBER'],
-      $params['PRCODE'],
-      $params['SRCODE'],
-      $params['RESULTTEXT'],
-      $digest,
-      $digest1
-    );
+        $response = new PaymentResponse(
+                $params['OPERATION'],
+                $params['ORDERNUMBER'],
+                $params['MERORDERNUMBER'],
+                $params['PRCODE'],
+                $params['SRCODE'],
+                $params['RESULTTEXT'],
+                $digest,
+                $digest1
+        );
 
-    $api = new Api($merchantNumber, 'http://foo.bar', $signer);
+        $api = new Api($merchantNumber, 'http://foo.bar', $signer);
 
-    $api->verifyPaymentResponse($response);
-  }
 
-  public function testCreatePaymentRequestUr () {
-    $this->markTestSkipped("Implement"); // move test from PaymentRequestUrlTest
-  }
+        $this->expectException(Exception::class);
+//        $this->expectException(PaymentResponseException::class);
 
-  public function testInvalidDigestInVerifyPaymentResponse () {
-    $this->markTestSkipped("Implement");
-  }
+        $api->verifyPaymentResponse($response);
+    }
+
+    public function testCreatePaymentRequestUr() {
+        $this->markTestSkipped("Implement"); // move test from PaymentRequestUrlTest
+    }
+
+    public function testInvalidDigestInVerifyPaymentResponse() {
+        $this->markTestSkipped("Implement");
+    }
+
 }

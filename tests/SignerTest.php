@@ -6,94 +6,107 @@ use PHPUnit\Framework\TestCase;
 
 class SignerTest extends TestCase {
 
-  /**
-   * @expectedException \AdamStipak\Webpay\SignerException
-   */
-  public function testConstructorWithInvalidPrivateKey () {
-    $signer = new Signer(
-      __DIR__ . '/keys/not-exists-key.pem',
-      'changeit',
-      __DIR__ . '/keys/test_cert.pem'
-    );
-  }
+    /**
+     * @expectedException \AdamStipak\Webpay\SignerException
+     */
+    public function testConstructorWithInvalidPrivateKey() {
+        $this->expectException(SignerException::class);
 
-  /**
-   * @expectedException \AdamStipak\Webpay\SignerException
-   */
-  public function testConstructorWithInvalidPublicKey () {
-    $signer = new Signer(
-      __DIR__ . '/keys/test_key.pem',
-      'changeit',
-      __DIR__ . '/keys/not-exists-key.pem'
-    );
-  }
+        $signer = new Signer(
+                __DIR__ . '/keys/not-exists-key.pem',
+                'changeit',
+                __DIR__ . '/keys/test_cert.pem'
+        );
+    }
 
-  public function testSign () {
-    $privateKeyResource = openssl_pkey_get_private(
-      file_get_contents(__DIR__ . '/keys/test_key.pem'),
-      'changeit'
-    );
+    /**
+     * @expectedException \AdamStipak\Webpay\SignerException
+     */
+    public function testConstructorWithInvalidPublicKey() {
+        $this->expectException(SignerException::class);
+        $signer = new Signer(
+                __DIR__ . '/keys/test_key.pem',
+                'changeit',
+                __DIR__ . '/keys/not-exists-key.pem'
+        );
+    }
 
-    $params = [
-      'param1' => 'foo',
-      'param2' => 'bar',
-    ];
+    public function testSign() {
+        $privateKeyResource = openssl_pkey_get_private(
+                file_get_contents(__DIR__ . '/keys/test_key.pem'),
+                'changeit'
+        );
 
-    $digestText = implode('|', $params);
-    openssl_sign($digestText, $expectedDigest, $privateKeyResource);
-    $expectedDigest = base64_encode($expectedDigest);
+        $params = [
+            'MERCHANTNUMBER' => 1234,
+            'OPERATION' => 'TEST',
+            'ORDERNUMBER' => '123456',
+            'AMOUNT' => 200.100,
+            'DEPOSITFLAG' => 1,
+            'URL' => 'https://localhost/',
+        ];
 
-    $signer = new Signer(
-      __DIR__ . '/keys/test_key.pem',
-      'changeit',
-      __DIR__ . '/keys/test_cert.pem'
-    );
+        $digestText = implode('|', $params);
+        openssl_sign($digestText, $expectedDigest, $privateKeyResource);
+        $expectedDigest = base64_encode($expectedDigest);
 
-    $this->assertEquals(
-      $expectedDigest,
-      $signer->sign($params)
-    );
-  }
+        $signer = new Signer(
+                __DIR__ . '/keys/test_key.pem',
+                'changeit',
+                __DIR__ . '/keys/test_cert.pem'
+        );
 
-  public function testVerify () {
-    $privateKeyResource = openssl_pkey_get_private(
-      file_get_contents(__DIR__ . '/keys/test_key.pem'),
-      'changeit'
-    );
+        $this->assertEquals(
+                $expectedDigest,
+                $signer->sign($params)
+        );
+    }
 
-    $params = [
-      'param1' => 'foo',
-      'param2' => 'bar',
-    ];
+    public function testVerify() {
+        $privateKeyResource = openssl_pkey_get_private(
+                file_get_contents(__DIR__ . '/keys/test_key.pem'),
+                'changeit'
+        );
 
-    $digestText = implode('|', $params);
-    openssl_sign($digestText, $expectedDigest, $privateKeyResource);
-    $digest = base64_encode($expectedDigest);
+        $params = [
+            'param1' => 'foo',
+            'param2' => 'bar',
+        ];
 
-    $signer = new Signer(
-      __DIR__ . '/keys/test_key.pem',
-      'changeit',
-      __DIR__ . '/keys/test_cert.pem'
-    );
+        $digestText = implode('|', $params);
+        openssl_sign($digestText, $expectedDigest, $privateKeyResource);
+        $digest = base64_encode($expectedDigest);
 
-    $this->assertTrue($signer->verify($params, $digest));
-  }
+        $signer = new Signer(
+                __DIR__ . '/keys/test_key.pem',
+                'changeit',
+                __DIR__ . '/keys/test_cert.pem'
+        );
 
-  /**
-   * @expectedException \AdamStipak\Webpay\SignerException
-   */
-  public function testVerifyWithInvalidDigest () {
-    $params = [
-      'param1' => 'foo',
-      'param2' => 'bar',
-    ];
 
-    $signer = new Signer(
-      __DIR__ . '/keys/test_key.pem',
-      'changeit',
-      __DIR__ . '/keys/test_cert.pem'
-    );
+//        $this->expectException(SignerException::class);
+        //SignerException("Digest is not correct!");
 
-    $signer->verify($params, 'invalid-digest');
-  }
+        $this->assertTrue($signer->verify($params, $digest));
+    }
+
+    /**
+     * @expectedException \AdamStipak\Webpay\SignerException
+     */
+    public function testVerifyWithInvalidDigest() {
+        $params = [
+            'param1' => 'foo',
+            'param2' => 'bar',
+        ];
+
+        $signer = new Signer(
+                __DIR__ . '/keys/test_key.pem',
+                'changeit',
+                __DIR__ . '/keys/test_cert.pem'
+        );
+
+        $this->expectException(SignerException::class);
+        $signer->verify($params, 'invalid-digest');
+    }
+
 }
