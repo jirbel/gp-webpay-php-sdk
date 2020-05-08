@@ -65,7 +65,7 @@ class Signer {
                 $paramsOrdered[$panme] = $params[$panme];
             }
             if (Api::PAYMENT_PARAMS[$panme]['required'] === true) {
-                if(!array_key_exists($panme, $params)){
+                if(($panme != 'DIGEST') && !array_key_exists($panme, $params)){
                     throw new SignerException('Required field '.$panme.' is not present in params to sign');
                 }
             }
