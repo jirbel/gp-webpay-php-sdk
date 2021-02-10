@@ -1,10 +1,10 @@
 {
-  "name": "purehtml/gpwebpay",
+  "name": "jirbel/gpwebpay",
   "description": "GP Webpay API Wrapper",
   "type": "library",
   "keywords": ["webpay", "php"],
   "license": "MIT",
-  "homepage": "https://github.com/PureHTML/gp-webpay-php-sdk",
+  "homepage": "https://github.com/jirbel/gp-webpay-php-sdk",
   "replace": {
         "adamstipak/webpay-php": "*"
   },
