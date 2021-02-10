@@ -2,6 +2,7 @@
 
 namespace AdamStipak\Webpay;
 
-class SignerException extends \Exception {
+class SignerException extends \Exception
+{
 
 }

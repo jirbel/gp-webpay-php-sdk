@@ -2,74 +2,81 @@
 
 namespace AdamStipak\Webpay;
 
-class PaymentResponse {
+class PaymentResponse
+{
 
-  /** @var array */
-  private $params = [];
+    /** @var array */
+    private $params = [];
 
-  /** @var string */
-  private $digest;
+    /** @var string */
+    private $digest;
 
-  /** @var string */
-  private $digest1;
+    /** @var string */
+    private $digest1;
 
-  /**
-   * @param string $operation
-   * @param string $ordernumber
-   * @param string $merordernum
-   * @param int $prcode
-   * @param int $srcode
-   * @param string $resulttext
-   * @param string $digest
-   * @param string $digest1
-   */
-  public function __construct (string $operation, string $ordernumber, string $merordernum = null, int $prcode, int $srcode, string $resulttext, string $digest, string $digest1) {
-    $this->params['operation'] = $operation;
-    $this->params['ordermumber'] = $ordernumber;
-    if ($merordernum !== null) {
-      $this->params['merordernum'] = $merordernum;
+    /**
+     * @param string $operation
+     * @param string $ordernumber
+     * @param string $merordernum
+     * @param int $prcode
+     * @param int $srcode
+     * @param string $resulttext
+     * @param string $digest
+     * @param string $digest1
+     */
+    public function __construct(string $operation, string $ordernumber, string $merordernum = null, int $prcode, int $srcode, string $resulttext, string $digest, string $digest1)
+    {
+        $this->params['operation'] = $operation;
+        $this->params['ordermumber'] = $ordernumber;
+        if ($merordernum !== null) {
+            $this->params['merordernum'] = $merordernum;
+        }
+        $this->params['prcode'] = $prcode;
+        $this->params['srcode'] = $srcode;
+        $this->params['resulttext'] = $resulttext;
+        $this->digest = $digest;
+        $this->digest1 = $digest1;
     }
-    $this->params['prcode'] = $prcode;
-    $this->params['srcode'] = $srcode;
-    $this->params['resulttext'] = $resulttext;
-    $this->digest = $digest;
-    $this->digest1 = $digest1;
-  }
 
-  /**
-   * @return array
-   */
-  public function getParams (): array {
-    return $this->params;
-  }
+    /**
+     * @return array
+     */
+    public function getParams(): array
+    {
+        return $this->params;
+    }
 
-  /**
-   * @return mixed
-   */
-  public function getDigest (): string {
-    return $this->digest;
-  }
+    /**
+     * @return mixed
+     */
+    public function getDigest(): string
+    {
+        return $this->digest;
+    }
 
-  /**
-   * @return bool
-   */
-  public function hasError (): bool {
-    return (bool) $this->params['prcode'] || (bool) $this->params['srcode'];
-  }
+    /**
+     * @return bool
+     */
+    public function hasError(): bool
+    {
+        return (bool)$this->params['prcode'] || (bool)$this->params['srcode'];
+    }
 
-  /**
-   * @return string
-   */
-  public function getDigest1 (): string {
-    return $this->digest1;
-  }
-  
+    /**
+     * @return string
+     */
+    public function getDigest1(): string
+    {
+        return $this->digest1;
+    }
+
     /**
      * Known Primary response codde states
-     *  
+     *
      * @return array<string> PRCODE meaning codes
      */
-    public static function prcode_meanings() {
+    public static function prcode_meanings()
+    {
         return [
             0 => 'OK',
             1 => _('Field too long'),
@@ -110,10 +117,11 @@ class PaymentResponse {
 
     /**
      * Secondary response code menanigs
-     * 
+     *
      * @return array<string> SRCODE meaning
      */
-    public static function srcode_meanings() {
+    public static function srcode_meanings()
+    {
 
         return [
             0 => null,
@@ -137,13 +145,14 @@ class PaymentResponse {
 
     /**
      * full response meang for given PRCODE and SRCODE
-     * 
+     *
      * @param int $prcode
      * @param int $srcode
-     * 
+     *
      * @return string response meaning
      */
-    public static function response_meaning($prcode, $srcode) {
+    public static function response_meaning($prcode, $srcode)
+    {
         switch ($prcode) {
             case 1:
             case 2:
@@ -160,5 +169,5 @@ class PaymentResponse {
                 break;
         }
     }
-  
+
 }

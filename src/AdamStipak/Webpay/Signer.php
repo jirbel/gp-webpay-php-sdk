@@ -2,7 +2,8 @@
 
 namespace AdamStipak\Webpay;
 
-class Signer {
+class Signer
+{
 
     /** @var string */
     private $privateKey;
@@ -21,14 +22,15 @@ class Signer {
 
     /**
      * Request Signer Class
-     * 
+     *
      * @param string $privateKey path to file
      * @param string $privateKeyPassword in plaintext
-     * @param string $publicKey  path to file
-     * 
+     * @param string $publicKey path to file
+     *
      * @throws SignerException
      */
-    public function __construct(string $privateKey, string $privateKeyPassword, string $publicKey) {
+    public function __construct(string $privateKey, string $privateKeyPassword, string $publicKey)
+    {
         if (!file_exists($privateKey) || !is_readable($privateKey)) {
             throw new SignerException("Private key ({$privateKey}) not exists or not readable!");
         }
@@ -44,12 +46,13 @@ class Signer {
 
     /**
      * Obtain private key as resource
-     * 
+     *
      * @return resource
-     * 
+     *
      * @throws SignerException
      */
-    private function getPrivateKeyResource() {
+    private function getPrivateKeyResource()
+    {
         if ($this->privateKeyResource) {
             return $this->privateKeyResource;
         }
@@ -65,21 +68,22 @@ class Signer {
 
     /**
      * Reorder parmas as required for digest calculation
-     * 
+     *
      * @param array $params for request
      * @param boolean $checkRequied check for requied columns
-     * 
+     *
      * @return array params in proper order
-     * 
+     *
      * @throws SignerException An required field  is not present in params
      */
-    public static function reorderParams(array $params, $checkRequired = false) {
+    public static function reorderParams(array $params, $checkRequired = false)
+    {
         $paramsOrdered = [];
         foreach (Api::PAYMENT_PARAMS as $panme => $pprps) {
             if (array_key_exists($panme, $params)) {
                 $paramsOrdered[$panme] = $params[$panme];
             }
-            if (($checkRequired == true) &&  (Api::PAYMENT_PARAMS[$panme]['required'] === true)) {
+            if (($checkRequired == true) && (Api::PAYMENT_PARAMS[$panme]['required'] === true)) {
                 if (($panme != 'DIGEST') && !array_key_exists($panme, $params)) {
                     throw new SignerException('Required field ' . $panme . ' is not present in params to sign');
                 }
@@ -90,12 +94,13 @@ class Signer {
 
     /**
      * Reorder params to proper order and sign to make DIGEST value
-     * 
+     *
      * @param array $params
-     * 
+     *
      * @return string
      */
-    public function sign(array $params): string {
+    public function sign(array $params): string
+    {
         $digestText = implode('|', self::reorderParams($params, true));
         openssl_sign($digestText, $digest, $this->getPrivateKeyResource());
         $digest = base64_encode($digest);
@@ -104,15 +109,16 @@ class Signer {
 
     /**
      * Verify digest
-     * 
+     *
      * @param array $params
      * @param string $digest
-     * 
+     *
      * @return bool
-     * 
+     *
      * @throws SignerException
      */
-    public function verify(array $params, $digest) {
+    public function verify(array $params, $digest)
+    {
         $data = implode('|', self::reorderParams($params, true));
         $digest = base64_decode($digest);
 
@@ -127,12 +133,13 @@ class Signer {
 
     /**
      * Obtain public key resource
-     * 
+     *
      * @return resource
-     * 
+     *
      * @throws SignerException
      */
-    private function getPublicKeyResource() {
+    private function getPublicKeyResource()
+    {
         if ($this->publicKeyResource) {
             return $this->publicKeyResource;
         }

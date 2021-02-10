@@ -2,6 +2,7 @@
 
 namespace AdamStipak\Webpay;
 
-class Exception extends \Exception {
+class Exception extends \Exception
+{
 
 }
