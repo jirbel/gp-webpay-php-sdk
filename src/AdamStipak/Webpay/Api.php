@@ -18,30 +18,58 @@ class Api
      * Payment request parameters in requied order
      */
     const PAYMENT_PARAMS = [
-        'MERCHANTNUMBER' => ['type' => 'string', 'size' => 10, 'required' => true],
-        'OPERATION' => ['type' => 'string', 'size' => 20, 'required' => true],
-        'ORDERNUMBER' => ['type' => 'numeric', 'size' => 15, 'required' => true],
-        'AMOUNT' => ['type' => 'numeric', 'size' => 15, 'required' => true],
-        'CURRENCY' => ['type' => 'numeric', 'size' => 3, 'required' => null], // pokud není uvedeno, použije se default z obchodníka nebo banky
-        'DEPOSITFLAG' => ['type' => 'numeric', 'size' => 1, 'required' => true],
-        'MERORDERNUM' => ['type' => 'numeric', 'size' => 30, 'required' => false],
-        'URL' => ['type' => 'string', 'size' => 300, 'required' => true],
-        'DESCRIPTION' => ['type' => 'string', 'size' => 255, 'required' => false],
-        'MD' => ['type' => 'string', 'size' => 255, 'required' => null],
-        'USERPARAM1' => ['type' => 'string', 'size' => 255, 'required' => null], // povinné pro registrační platbu pro funkci Opakovaná platba, Uložená karta, Uložená karta 3D, jinak nepovinné
-        'VRCODE' => ['type' => 'string', 'size' => 48, 'required' => null], //pole povinné pro zaslání ověřovacího kódu prostřednictvím názvu obchodníka do AC
-        'FASTPAYID' => ['type' => 'numeric', 'size' => 15, 'required' => null], //povinné, pokud je využita služba Fastpay
-        'PAYMETHOD' => ['type' => 'string', 'size' => 255, 'required' => false],
-        'DISABLEPAYMETHOD' => ['type' => 'string', 'size' => 255, 'required' => false],
-        'PAYMETHODS' => ['type' => 'string', 'size' => 255, 'required' => false],
-        'EMAIL' => ['type' => 'string', 'size' => 255, 'required' => false],
-        'REFERENCENUMBER' => ['type' => 'string', 'size' => 20, 'required' => false],
-        'ADDINFO' => ['type' => 'xml', 'size' => 24000, 'required' => false], // schéma
-        'PANPATTERN' => ['type' => 'string', 'size' => 255, 'required' => false],
-        'TOKEN' => ['type' => 'string', 'size' => 64, 'required' => false],
-        'FASTTOKEN' => ['type' => 'string', 'size' => 64, 'required' => null], //povinné, pokud je využita služba Fasttoken
-        'DIGEST' => ['type' => 'string', 'size' => 2000, 'required' => true],
-        'LANG' => ['type' => 'string', 'size' => 2, 'required' => false],
+        'MERCHANTNUMBER' => ['type' => 'string', 'size' => 10, 'required' => true, 'digest' => true],
+        'OPERATION' => ['type' => 'string', 'size' => 20, 'required' => true, 'digest' => true],
+        'ORDERNUMBER' => ['type' => 'numeric', 'size' => 15, 'required' => true, 'digest' => true],
+        'AMOUNT' => ['type' => 'numeric', 'size' => 15, 'required' => true, 'digest' => true],
+        'CURRENCY' => ['type' => 'numeric', 'size' => 3, 'required' => null, 'digest' => true], // pokud není uvedeno, použije se default z obchodníka nebo banky
+        'DEPOSITFLAG' => ['type' => 'numeric', 'size' => 1, 'required' => true, 'digest' => true],
+        'MERORDERNUM' => ['type' => 'numeric', 'size' => 30, 'required' => false, 'digest' => true],
+        'URL' => ['type' => 'string', 'size' => 300, 'required' => true, 'digest' => true],
+        'DESCRIPTION' => ['type' => 'string', 'size' => 255, 'required' => false, 'digest' => true],
+        'MD' => ['type' => 'string', 'size' => 255, 'required' => null, 'digest' => true],
+        // 'USERPARAM1' => ['type' => 'string', 'size' => 255, 'required' => null, 'digest' => false], // povinné pro registrační platbu pro funkci Opakovaná platba, Uložená karta, Uložená karta 3D, jinak nepovinné
+        // 'VRCODE' => ['type' => 'string', 'size' => 48, 'required' => null, 'digest' => false], //pole povinné pro zaslání ověřovacího kódu prostřednictvím názvu obchodníka do AC
+        // 'FASTPAYID' => ['type' => 'numeric', 'size' => 15, 'required' => null, 'digest' => false], //povinné, pokud je využita služba Fastpay
+        'PAYMETHOD' => ['type' => 'string', 'size' => 255, 'required' => false, 'digest' => true],
+        'DISABLEPAYMETHOD' => ['type' => 'string', 'size' => 255, 'required' => false, 'digest' => true],
+        'PAYMETHODS' => ['type' => 'string', 'size' => 255, 'required' => false, 'digest' => true],
+        'EMAIL' => ['type' => 'string', 'size' => 255, 'required' => false, 'digest' => true],
+        'REFERENCENUMBER' => ['type' => 'string', 'size' => 20, 'required' => false, 'digest' => true],
+        'ADDINFO' => ['type' => 'xml', 'size' => 24000, 'required' => false, 'digest' => true], // schéma
+        // 'PANPATTERN' => ['type' => 'string', 'size' => 255, 'required' => false, 'digest' => false],
+        // 'TOKEN' => ['type' => 'string', 'size' => 64, 'required' => false, 'digest' => false],
+        // 'FASTTOKEN' => ['type' => 'string', 'size' => 64, 'required' => null, 'digest' => false], //povinné, pokud je využita služba Fasttoken
+        'DIGEST' => ['type' => 'string', 'size' => 2000, 'required' => true, 'digest' => false],
+        'LANG' => ['type' => 'string', 'size' => 2, 'required' => false, 'digest' => false],
+        // 'PRCODE' => ['type' => 'string', 'size' => 2, 'required' => false, 'digest' => false],
+        // 'SRCODE' => ['type' => 'string', 'size' => 2, 'required' => false, 'digest' => false],
+        // 'RESULTTEXT' => ['type' => 'string', 'size' => 2, 'required' => false, 'digest' => false],
+    ];
+
+    const PAYMENT_RESPONSE_PARAMS = [
+        'OPERATION' => ['type' => 'string', 'size' => 20, 'required' => true, 'digest' => true],
+        'ORDERNUMBER' => ['type' => 'numeric', 'size' => 15, 'required' => true, 'digest' => true],
+        'MERORDERNUM' => ['type' => 'numeric', 'size' => 30, 'required' => false, 'digest' => true],
+        'MD' => ['type' => 'string', 'size' => 255, 'required' => null, 'digest' => true],
+        'PRCODE' => ['type' => 'numeric', 'size' => null, 'required' => true, 'digest' => true],
+        'SRCODE' => ['type' => 'numeric', 'size' => null, 'required' => true, 'digest' => true],
+        'RESULTTEXT' => ['type' => 'string', 'size' => 255, 'required' => false, 'digest' => true],
+        'USERPARAM1' => ['type' => 'string', 'size' => 64, 'required' => null, 'digest' => true], // povinné pro registrační platbu pro funkci Opakovaná platba, Uložená karta, Uložená karta 3D, jinak nepovinné
+        'ADDINFO' => ['type' => 'xml', 'size' => null, 'required' => false, 'digest' => true], // schéma
+        'TOKEN' => ['type' => 'string', 'size' => 64, 'required' => false, 'digest' => true],
+        'EXPIRY' => ['type' => 'string', 'size' => 4, 'required' => false, 'digest' => true], // Expirace použité platební karty ve formátu YYMM
+        'ACSRES' => ['type' => 'string', 'size' => 1, 'required' => false, 'digest' => true], // N = nebyl proveden pokus o ověření, A = byl proveden pokus, F = držitel se plně autentikoval, D = držitel nebyl úspěšně ověřen, E = technický problém
+        'ACCODE' => ['type' => 'string', 'size' => 6, 'required' => false, 'digest' => true],
+        'PANPATTERN' => ['type' => 'string', 'size' => 19, 'required' => false, 'digest' => true],
+        'DAYTOCAPTURE' => ['type' => 'string', 'size' => 8, 'required' => false, 'digest' => true],
+        'TOKENREGSTATUS' => ['type' => 'string', 'size' => 10, 'required' => false, 'digest' => true],
+        'ACRC' => ['type' => 'string', 'size' => 2, 'required' => false, 'digest' => true],
+        'RRN' => ['type' => 'string', 'size' => 12, 'required' => false, 'digest' => true],
+        'PAR' => ['type' => 'string', 'size' => 29, 'required' => false, 'digest' => true],
+        'TRACEID' => ['type' => 'string', 'size' => 15, 'required' => false, 'digest' => true],
+        'DIGEST' => ['type' => 'string', 'size' => 2000, 'required' => true, 'digest' => false],
+        'DIGEST1' => ['type' => 'string', 'size' => 2000, 'required' => true, 'digest' => false],
     ];
 
     /**
