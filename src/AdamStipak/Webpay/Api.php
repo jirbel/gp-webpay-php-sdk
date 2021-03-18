@@ -70,11 +70,10 @@ class Api
         'TRACEID' => ['type' => 'string', 'size' => 15, 'required' => false, 'digest' => true],
         'DIGEST' => ['type' => 'string', 'size' => 2000, 'required' => true, 'digest' => false],
         'DIGEST1' => ['type' => 'string', 'size' => 2000, 'required' => true, 'digest' => false],
+        'MERCHANTNUMBER' => ['type' => 'string', 'size' => 10, 'required' => false, 'digest' => true],
     ];
 
     /**
-     * API Client Class
-     *
      * @param $merchantNumber
      * @param $webPayUrl
      * @param Signer $signer
@@ -87,15 +86,12 @@ class Api
     }
 
     /**
-     * Generate Request URL from object content
-     *
      * @param PaymentRequest $request
-     *
      * @return string
      */
     public function createPaymentRequestUrl(PaymentRequest $request): string
     {
-// build request URL based on PaymentRequest
+        // build request URL based on PaymentRequest
         $paymentUrl = $this->webPayUrl . '?' . http_build_query($this->createPaymentParam($request));
 
         return $paymentUrl;
@@ -103,12 +99,11 @@ class Api
 
     /**
      * @param \AdamStipak\Webpay\PaymentRequest $request
-     *
      * @return array
      */
     public function createPaymentParam(PaymentRequest $request): array
     {
-// digest request
+        // digest request
         $request->setMerchantNumber($this->merchantNumber);
         $params = $request->getParams();
         $request->setDigest($this->signer->sign($params));
@@ -117,34 +112,31 @@ class Api
     }
 
     /**
-     * Payment Response verification
-     *
      * @param PaymentResponse $response
      * @throws Exception
      * @throws PaymentResponseException
      */
     public function verifyPaymentResponse(PaymentResponse $response)
     {
-// verify digest & digest1
+        // verify digest & digest1
         try {
             $responseParams = $response->getParams();
             $this->signer->verify($responseParams, $response->getDigest());
 
-            $responseParams['MERCHANTNUMBER'] = $this->merchantNumber;
-
-            $this->signer->verify($responseParams, $response->getDigest1());
+            $this->signer->verify($responseParams, $response->getDigest1(), ['MERCHANTNUMBER' => $this->merchantNumber]);
         } catch (SignerException $e) {
             throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
 
-// verify PRCODE and SRCODE
+        // verify PRCODE and SRCODE
         if (false !== $response->hasError()) {
+            $prcode = $response->getParams()['prcode'];
+            $srcode = $response->getParams()['srcode'];
             throw new PaymentResponseException(
-                $response->getParams()['prcode'],
-                $response->getParams()['srcode'],
-                "Response has an error."
+                $prcode,
+                $srcode,
+                "Response has an error. {$prcode}:{$srcode}"
             );
         }
     }
-
 }

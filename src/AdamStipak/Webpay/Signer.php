@@ -20,6 +20,7 @@ class Signer
     /** @var resource */
     private $publicKeyResource;
 
+
     /**
      * Request Signer Class
      *
@@ -45,10 +46,7 @@ class Signer
     }
 
     /**
-     * Obtain private key as resource
-     *
      * @return resource
-     *
      * @throws SignerException
      */
     private function getPrivateKeyResource()
@@ -76,15 +74,19 @@ class Signer
      *
      * @throws SignerException An required field  is not present in params
      */
-    public static function reorderParams(array $params, $checkRequired = false)
+    public static function reorderParams(array $params, $checkRequired = false, $apiParams = Api::PAYMENT_PARAMS)
     {
+        $digestParams = array_filter($apiParams, function ($v, $k) {
+            return $v['digest'] === true;
+        }, ARRAY_FILTER_USE_BOTH);
+
         $paramsOrdered = [];
-        foreach (Api::PAYMENT_PARAMS as $panme => $pprps) {
+        foreach ($digestParams as $panme => $pprps) {
             if (array_key_exists($panme, $params)) {
                 $paramsOrdered[$panme] = $params[$panme];
             }
-            if (($checkRequired == true) && (Api::PAYMENT_PARAMS[$panme]['required'] === true)) {
-                if (($panme != 'DIGEST') && !array_key_exists($panme, $params)) {
+            if (($checkRequired == true) && ($digestParams[$panme]['required'] === true)) {
+                if (($panme != 'DIGEST' || $panme != 'DIGEST1') && !array_key_exists($panme, $params)) {
                     throw new SignerException('Required field ' . $panme . ' is not present in params to sign');
                 }
             }
@@ -93,35 +95,27 @@ class Signer
     }
 
     /**
-     * Reorder params to proper order and sign to make DIGEST value
-     *
      * @param array $params
-     *
      * @return string
      */
     public function sign(array $params): string
     {
-        // $digestText = implode('|', self::reorderParams($params, true));
-        $digestText = implode('|', $params);
+        $digestText = implode('|', self::reorderParams($params, true));
         openssl_sign($digestText, $digest, $this->getPrivateKeyResource());
         $digest = base64_encode($digest);
+
         return $digest;
     }
 
     /**
-     * Verify digest
-     *
      * @param array $params
      * @param string $digest
-     *
      * @return bool
-     *
      * @throws SignerException
      */
-    public function verify(array $params, $digest)
+    public function verify(array $params, $digest, $additionalParams = [])
     {
-        // $data = implode('|', self::reorderParams($params, true));
-        $data = implode('|', $params);
+        $data = implode('|', self::reorderParams(array_merge($params, $additionalParams), true, Api::PAYMENT_RESPONSE_PARAMS));
         $digest = base64_decode($digest);
 
         $ok = openssl_verify($data, $digest, $this->getPublicKeyResource());
@@ -134,10 +128,7 @@ class Signer
     }
 
     /**
-     * Obtain public key resource
-     *
      * @return resource
-     *
      * @throws SignerException
      */
     private function getPublicKeyResource()
@@ -156,5 +147,4 @@ class Signer
 
         return $this->publicKeyResource;
     }
-
 }

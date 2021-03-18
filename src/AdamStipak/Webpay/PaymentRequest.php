@@ -71,7 +71,6 @@ class PaymentRequest
 
     /**
      * Gives You all Request params
-     *
      * @return array
      */
     public function getParams(): array
@@ -82,12 +81,12 @@ class PaymentRequest
     /**
      * Set The Merchant Number for request
      *
-     * @param $number Attributed merchant number.
+     * @param $number - Attributed merchant number.
      * @internal
      */
     public function setMerchantNumber($number)
     {
-        $this->setParam('MERCHANTNUMBER', $number);
+        $this->params['MERCHANTNUMBER'] = $number;
     }
 
     /**
@@ -97,7 +96,7 @@ class PaymentRequest
      */
     public function setDescription($value)
     {
-        $this->setParam('DESCRIPTION', $value);
+        $this->params['DESCRIPTION'] = $value;
     }
 
     /**
@@ -186,5 +185,4 @@ class PaymentRequest
             throw new Exception('Unknown payment parameter: ' . $key);
         }
     }
-
 }
