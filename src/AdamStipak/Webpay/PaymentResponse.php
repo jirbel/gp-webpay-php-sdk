@@ -8,15 +8,9 @@ class PaymentResponse
     /** @var array */
     private $params = [];
 
-    /** @var string */
-    private $digest;
-
-    /** @var string */
-    private $digest1;
-
     /**
      * @param string $operation
-     * @param string $ordernumber
+     * @param int $ordernumber
      * @param string $merordernum
      * @param int $prcode
      * @param int $srcode
@@ -24,18 +18,18 @@ class PaymentResponse
      * @param string $digest
      * @param string $digest1
      */
-    public function __construct(string $operation, string $ordernumber, string $merordernum = null, int $prcode, int $srcode, string $resulttext, string $digest, string $digest1)
+    public function __construct(string $operation, int $ordernumber, string $merordernum = null, int $prcode, int $srcode, string $resulttext, string $digest, string $digest1)
     {
-        $this->params['operation'] = $operation;
-        $this->params['ordermumber'] = $ordernumber;
+        $this->params['OPERATION'] = $operation;
+        $this->params['ORDERNUMBER'] = $ordernumber;
         if ($merordernum !== null) {
-            $this->params['merordernum'] = $merordernum;
+            $this->params['MERORDERNUM'] = $merordernum;
         }
-        $this->params['prcode'] = $prcode;
-        $this->params['srcode'] = $srcode;
-        $this->params['resulttext'] = $resulttext;
-        $this->digest = $digest;
-        $this->digest1 = $digest1;
+        $this->params['PRCODE'] = $prcode;
+        $this->params['SRCODE'] = $srcode;
+        $this->params['RESULTTEXT'] = $resulttext;
+        $this->params['DIGEST'] = $digest;
+        $this->params['DIGEST1'] = $digest1;
     }
 
     /**
@@ -51,7 +45,7 @@ class PaymentResponse
      */
     public function getDigest(): string
     {
-        return $this->digest;
+        return $this->params['DIGEST'];
     }
 
     /**
@@ -67,7 +61,7 @@ class PaymentResponse
      */
     public function getDigest1(): string
     {
-        return $this->digest1;
+        return $this->params['DIGEST1'];
     }
 
     /**

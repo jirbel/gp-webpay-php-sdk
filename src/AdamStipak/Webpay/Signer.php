@@ -2,6 +2,8 @@
 
 namespace AdamStipak\Webpay;
 
+use function Clue\StreamFilter\fun;
+
 class Signer
 {
 
@@ -76,15 +78,19 @@ class Signer
      *
      * @throws SignerException An required field  is not present in params
      */
-    public static function reorderParams(array $params, $checkRequired = false)
+    public static function reorderParams(array $params, $checkRequired = false, $apiParams = Api::PAYMENT_PARAMS)
     {
+        $digestParams = array_filter($apiParams, function ($v, $k) {
+            return $v['digest'] === true;
+        }, ARRAY_FILTER_USE_BOTH);
+
         $paramsOrdered = [];
-        foreach (Api::PAYMENT_PARAMS as $panme => $pprps) {
+        foreach ($digestParams as $panme => $pprps) {
             if (array_key_exists($panme, $params)) {
                 $paramsOrdered[$panme] = $params[$panme];
             }
-            if (($checkRequired == true) && (Api::PAYMENT_PARAMS[$panme]['required'] === true)) {
-                if (($panme != 'DIGEST') && !array_key_exists($panme, $params)) {
+            if (($checkRequired == true) && ($digestParams[$panme]['required'] === true)) {
+                if (($panme != 'DIGEST' || $panme != 'DIGEST1') && !array_key_exists($panme, $params)) {
                     throw new SignerException('Required field ' . $panme . ' is not present in params to sign');
                 }
             }
@@ -101,9 +107,12 @@ class Signer
      */
     public function sign(array $params): string
     {
-        $digestText = implode('|', self::reorderParams($params, true));
+        // $digestText = implode('|', self::reorderParams($params, true));
+        $digestText = implode('|', $params);
+        $digestText = $params['OPERATION']."|".$params['ORDERNUMBER']."|".$params['AMOUNT']."|".$params['CURRENCY']."|".$params['DEPOSITFLAG'];
         openssl_sign($digestText, $digest, $this->getPrivateKeyResource());
         $digest = base64_encode($digest);
+        // dd($params, self::reorderParams($params, true), $digest);
         return $digest;
     }
 
@@ -119,7 +128,12 @@ class Signer
      */
     public function verify(array $params, $digest)
     {
-        $data = implode('|', self::reorderParams($params, true));
+        // dd($params, self::reorderParams($params, true, Api::PAYMENT_RESPONSE_PARAMS));
+        // dd($digest, $params, self::reorderParams($params, true, Api::PAYMENT_RESPONSE_PARAMS), openssl_verify(implode('|', self::reorderParams($params, true, Api::PAYMENT_RESPONSE_PARAMS)), $digest, $this->getPublicKeyResource()));
+        // $data = implode('|', self::reorderParams($params, true, Api::PAYMENT_RESPONSE_PARAMS));
+        $data = implode('|', $params);
+        $data = $params['OPERATION']."|".$params['ORDERNUMBER']."|".$params['MERORDERNUM']."|".$params['PRCODE']."|".$params['SRCODE']."|".$params['RESULTTEXT']."|".$params['DIGEST']."|".$params['DIGEST1'];
+        // dd(implode('|', $params), $data);
         $digest = base64_decode($digest);
 
         $ok = openssl_verify($data, $digest, $this->getPublicKeyResource());
