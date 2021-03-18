@@ -101,7 +101,8 @@ class Signer
      */
     public function sign(array $params): string
     {
-        $digestText = implode('|', self::reorderParams($params, true));
+        // $digestText = implode('|', self::reorderParams($params, true));
+        $digestText = implode('|', $params);
         openssl_sign($digestText, $digest, $this->getPrivateKeyResource());
         $digest = base64_encode($digest);
         return $digest;
@@ -119,7 +120,8 @@ class Signer
      */
     public function verify(array $params, $digest)
     {
-        $data = implode('|', self::reorderParams($params, true));
+        // $data = implode('|', self::reorderParams($params, true));
+        $data = implode('|', $params);
         $digest = base64_decode($digest);
 
         $ok = openssl_verify($data, $digest, $this->getPublicKeyResource());
