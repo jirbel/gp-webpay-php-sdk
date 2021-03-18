@@ -40,10 +40,11 @@ class PaymentRequest
      * @param int $currency Currency code ISO 4217
      * @param int $depositFlag Request Indicates whether the payment is to be paid automatically. Allowed values: 0 = no immediate payment required 1 = payment is required
      * @param string $url Full Merchant URL. A result will be sent to this address  request. The result is forwarded over customer browser
-     * @param string|null $merOrderNumber Order Number. In case it is not specified, it will be used  value $orderNumber It will appear on the bank statement.
+     * @param int|null $merOrderNumber Order Number. In case it is not specified, it will be used  value $orderNumber It will appear on the bank statement.
      */
-    public function __construct(int $orderNumber, float $amount, int $currency, int $depositFlag, string $url, string $merOrderNumber = null)
+    public function __construct(int $orderNumber, float $amount, int $currency, int $depositFlag, string $url, int $merOrderNumber = null)
     {
+        $this->setParam('MERCHANTNUMBER', '');
         $this->setParam('OPERATION', 'CREATE_ORDER');
         $this->setParam('ORDERNUMBER', $orderNumber);
         $this->setParam('AMOUNT', $amount * 100);
@@ -163,14 +164,15 @@ class PaymentRequest
                     if ($value[0] != '<') {
                         throw new Exception('Payment parameter: ' . $key . ' is not XML');
                     }
+                    break;
                 case 'string':
-                    if (strlen($value) > Api::PAYMENT_PARAMS[$key]['size']) {
+                    if (Api::PAYMENT_PARAMS[$key]['size'] !== null && strlen($value) > Api::PAYMENT_PARAMS[$key]['size']) {
                         throw new Exception('Payment parameter: ' . $key . '  not fit in maximum size ' . Api::PAYMENT_PARAMS[$key]['size']);
                     }
                     break;
                 case 'numeric':
                     if (is_numeric($value)) {
-                        if (strlen(strval($value)) > Api::PAYMENT_PARAMS[$key]['size']) {
+                        if (Api::PAYMENT_PARAMS[$key]['size'] !== null && strlen(strval($value)) > Api::PAYMENT_PARAMS[$key]['size']) {
                             throw new Exception('Payment parameter: ' . $key . '  not fit in maximum size ' . Api::PAYMENT_PARAMS[$key]['size']);
                         }
                     } else {
