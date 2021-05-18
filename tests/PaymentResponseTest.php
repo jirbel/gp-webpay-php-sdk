@@ -10,22 +10,22 @@ class PaymentResponseTest extends TestCase {
         return [
             [
                 [
-                    'prcode' => 0,
-                    'srcode' => 0,
+                    'PRCODE' => 0,
+                    'SRCODE' => 0,
                 ],
                 false,
             ],
             [
                 [
-                    'prcode' => 97,
-                    'srcode' => 0,
+                    'PRCODE' => 97,
+                    'SRCODE' => 0,
                 ],
                 true,
             ],
             [
                 [
-                    'prcode' => 12,
-                    'srcode' => 32,
+                    'PRCODE' => 12,
+                    'SRCODE' => 32,
                 ],
                 true,
             ],
@@ -37,14 +37,14 @@ class PaymentResponseTest extends TestCase {
      */
     public function testHasError($codes, $result) {
         $response = new PaymentResponse(
-                'operation',
-                'ordernumber',
-                'merordernum',
-                $codes['prcode'],
-                $codes['srcode'],
-                'resultext',
-                'digest',
-                'digest1'
+                'OPERATION',
+                'ORDERNUMBER',
+                'MERORDERNUM',
+                $codes['PRCODE'],
+                $codes['SRCODE'],
+                'RESULTTEXT',
+                'DIGEST',
+                'DIGEST1'
         );
 
         $this->assertEquals($result, $response->hasError());
