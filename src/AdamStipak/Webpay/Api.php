@@ -130,8 +130,8 @@ class Api
 
         // verify PRCODE and SRCODE
         if (false !== $response->hasError()) {
-            $prcode = $response->getParams()['prcode'];
-            $srcode = $response->getParams()['srcode'];
+            $prcode = $response->getParams()['PRCODE'];
+            $srcode = $response->getParams()['SRCODE'];
             throw new PaymentResponseException(
                 $prcode,
                 $srcode,
