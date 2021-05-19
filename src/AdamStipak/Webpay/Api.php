@@ -98,6 +98,18 @@ class Api
     }
 
     /**
+     * @param PaymentRequest $request
+     * @return array
+     */
+    public function createPaymentRequestInfo(PaymentRequest $request): array
+    {
+        return [
+            'url' => $this->webPayUrl,
+            'params' => $this->createPaymentParam($request)
+        ];
+    }
+
+    /**
      * @param \AdamStipak\Webpay\PaymentRequest $request
      * @return array
      */
